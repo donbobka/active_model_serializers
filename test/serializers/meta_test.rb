@@ -48,7 +48,7 @@ module ActiveModel
       end
 
       def test_meta_is_not_used_on_arrays
-        serializer = ArraySerializer.new([@blog], root: "blog", meta: {total: 10}, meta_key: "haha_meta")
+        serializer = ArraySerializer.new([@blog], meta: {total: 10}, meta_key: "haha_meta")
         adapter = ActiveModel::Serializer::Adapter::Json.new(serializer)
         expected = [{
           id: 1,
@@ -63,6 +63,32 @@ module ActiveModel
             body: nil
           }]
         }]
+        assert_equal expected, adapter.as_json
+      end
+
+      def test_meta_is_used_on_arrays_with_root
+        serializer = ArraySerializer.new([@blog], root: "blogs", meta: {total: 10}, meta_key: "haha_meta")
+        adapter = ActiveModel::Serializer::Adapter::Json.new(serializer)
+        expected = {
+          haha_meta: {
+            total: 10
+          },
+          blogs: [
+            {
+              id: 1,
+              name: "AMS Hints",
+              writer: {
+                id: 2,
+                name: "Steve"
+              },
+              articles: [{
+                id: 3,
+                title: "AMS",
+                body: nil
+              }]
+            }
+          ]
+        }
         assert_equal expected, adapter.as_json
       end
 
